@@ -25,8 +25,6 @@ Go to `src/main/java/XChoiceApplication` and run the main function. By default, 
 
 Since this service calls MySQL database, to avoid exposing the database login credentials, I've taken the approach to use env variables. Thus to run locally, you need the following env variables: `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Those can be configured in your `.bash_profile` or `.zshrc` depending on which one your desktop is using. Because of the same security concern, I will not post the names here, thus please drop me a message or email kangxu.wang@outlook.com for variable details.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
 ### Run unit tests
 
 In IntelliJ, right click on `src/test/java` folder and select Run 'All Tests'.

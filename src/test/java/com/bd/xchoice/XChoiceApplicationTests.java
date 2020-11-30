@@ -9,5 +9,4 @@ class XChoiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
