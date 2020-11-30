@@ -1,5 +1,6 @@
 package com.bd.xchoice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,11 +32,21 @@ public class Question {
 
     private String title;
 
+    @JsonIgnore
     @ManyToOne
     private Survey survey;
 
-    @OneToMany(mappedBy = "question", cascade= CascadeType.PERSIST)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<Choice> choices;
 
     private boolean required;
+
+    public void attachReferenceToChild() {
+        if (choices != null) {
+            choices.forEach(choice -> {
+                choice.attachReferenceToChild();
+                choice.setQuestion(this);
+            });
+        }
+    }
 }

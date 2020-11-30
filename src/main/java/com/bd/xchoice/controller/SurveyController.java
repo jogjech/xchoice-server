@@ -2,6 +2,7 @@ package com.bd.xchoice.controller;
 
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
+import com.bd.xchoice.model.SurveyResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,7 @@ public interface SurveyController {
      * @return the Survey object
      */
     @GetMapping("/surveys/{id}")
-    Survey getSurvey(@PathVariable String id);
+    Survey getSurvey(@PathVariable Integer id);
 
     /**
      * Find surveys published by user.
@@ -40,14 +41,24 @@ public interface SurveyController {
      * @return the Survey object
      */
     @GetMapping("/surveys")
-    List<SurveyMetadata> findSurveys(@RequestParam String userId);
+    List<SurveyMetadata> findSurveys(@RequestParam Integer userId);
 
     /**
      * Post responses for a given survey.
      *
      * @param id The survey id
      * @param selections The list of integers. For an integer n of index i, it means selecting (n+1)th choice of (i+i)th question.
+     * @return Slug of the response.
      */
-    @PostMapping("/surveys/{id}/response")
-    void postResponse(@PathVariable String id, @RequestBody List<Integer> selections);
+    @PostMapping("/surveys/{id}/responses")
+    String postSurveyResponse(@PathVariable String id, @RequestBody List<Integer> selections);
+
+    /**
+     * Get responses using slug id.
+     *
+     * @param slug The response slug
+     * @return SurveyResponse which contains survey id and selections.
+     */
+    @GetMapping("/surveys/{id}/responses")
+    SurveyResponse findSurveyResponse(@RequestParam String slug);
 }

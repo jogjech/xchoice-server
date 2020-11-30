@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Data model for SurveyMetadata. Note: this is not a JPA entity, but a client facing response entity.
  * Will consider separating out internal and external data models.
@@ -13,13 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SurveyMetadata {
-
-    private int surveyId;
-
-    private String title;
-
-    private int responses;
-
-    private boolean published;
+public class SurveyResponse {
+    private String surveyId;
+    private List<Integer> selections;
 }
