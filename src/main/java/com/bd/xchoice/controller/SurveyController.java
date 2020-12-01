@@ -59,6 +59,6 @@ public interface SurveyController {
      * @param slug The response slug
      * @return SurveyResponse which contains survey id and selections.
      */
-    @GetMapping("/surveys/{id}/responses")
+    @GetMapping("/surveys/responses")
     SurveyResponse findSurveyResponse(@RequestParam String slug);
 }

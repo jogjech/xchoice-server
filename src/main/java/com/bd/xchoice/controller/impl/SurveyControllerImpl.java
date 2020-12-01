@@ -90,7 +90,29 @@ public class SurveyControllerImpl implements SurveyController {
     }
 
     @Override
-    public SurveyResponse findSurveyResponse(final String slug) {
-        return null;
+    public SurveyResponse findSurveyResponse(@NonNull final String slug) {
+        final List<Response> responses = responseRepository.findBySlug(slug);
+        if (responses.isEmpty()) throw new NoSuchElementException("Cannot find any response for slug " + slug);
+
+        final List<Choice> selectedChoices = responses.stream()
+                .map(Response::getChoice)
+                .collect(Collectors.toList());
+
+        final List<Question> questions = selectedChoices.stream()
+                .map(Choice::getQuestion)
+                .collect(Collectors.toList());
+
+        final List<Integer> selections = new ArrayList<>();
+
+        for (int i = 0; i < questions.size(); i++) {
+            final Question question = questions.get(i);
+            final Choice selectedChoice = selectedChoices.get(i);
+            int selectedIndex = question.getChoices().indexOf(selectedChoice);
+            selections.add(selectedIndex);
+        }
+        return SurveyResponse.builder()
+                .selections(selections)
+                .surveyId(questions.get(0).getSurvey().getId())
+                .build();
     }
 }

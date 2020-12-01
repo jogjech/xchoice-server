@@ -16,6 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SurveyResponse {
-    private String surveyId;
+    private int surveyId;
     private List<Integer> selections;
 }

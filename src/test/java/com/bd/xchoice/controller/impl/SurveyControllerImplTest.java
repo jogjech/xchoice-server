@@ -2,8 +2,10 @@ package com.bd.xchoice.controller.impl;
 
 import com.bd.xchoice.model.Choice;
 import com.bd.xchoice.model.Question;
+import com.bd.xchoice.model.Response;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
+import com.bd.xchoice.model.SurveyResponse;
 import com.bd.xchoice.model.User;
 import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
@@ -44,6 +46,8 @@ class SurveyControllerImplTest {
 
     private static final String TITLE_1 = "Title 1";
     private static final String TITLE_2 = "Title 2";
+    private static final String SLUG_1 = "slug1";
+    private static final String SLUG_2 = "slug2";
 
     @Mock
     private SurveyRepository surveyRepository;
@@ -75,6 +79,10 @@ class SurveyControllerImplTest {
     private Choice choice3;
     @Mock
     private Choice choice4;
+    @Mock
+    private Response response1;
+    @Mock
+    private Response response2;
 
     @InjectMocks
     private SurveyControllerImpl surveyController;
@@ -111,6 +119,17 @@ class SurveyControllerImplTest {
         choiceList2.add(choice4);
         when(question1.getChoices()).thenReturn(choiceList1);
         when(question2.getChoices()).thenReturn(choiceList2);
+        final List<Response> responseList = new ArrayList<>();
+        responseList.add(response1);
+        responseList.add(response2);
+        when(responseRepository.findBySlug(SLUG_1)).thenReturn(responseList);
+        when(responseRepository.findBySlug(SLUG_2)).thenReturn(new ArrayList<>());
+        when(response1.getChoice()).thenReturn(choice1);
+        when(response2.getChoice()).thenReturn(choice4);
+        when(choice1.getQuestion()).thenReturn(question1);
+        when(choice4.getQuestion()).thenReturn(question2);
+        when(question1.getSurvey()).thenReturn(survey1);
+        when(question2.getSurvey()).thenReturn(survey1);
     }
 
     @Test
@@ -193,5 +212,23 @@ class SurveyControllerImplTest {
     @Test
     void postSurveyResponse_surveyNotExist() {
         assertThrows(NoSuchElementException.class, () -> surveyController.postSurveyResponse(SURVEY_ID_2, Arrays.asList(0, 1)));
+    }
+
+    @Test
+    void findSurveyResponse_happyPath() {
+        final SurveyResponse surveyResponse = surveyController.findSurveyResponse(SLUG_1);
+
+        assertEquals(SURVEY_ID_1, surveyResponse.getSurveyId());
+        assertEquals(Arrays.asList(0, 1), surveyResponse.getSelections());
+    }
+
+    @Test
+    void findSurveyResponse_nullSlug() {
+        assertThrows(NullPointerException.class, () -> surveyController.findSurveyResponse(null));
+    }
+
+    @Test
+    void findSurveyResponse_responseNotExist() {
+        assertThrows(NoSuchElementException.class, () -> surveyController.findSurveyResponse(SLUG_2));
     }
 }
