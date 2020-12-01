@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data model for Survey.
@@ -34,6 +37,7 @@ public class Survey {
     private String title;
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private List<Question> questions;
 
     @JsonIgnore
@@ -56,10 +60,11 @@ public class Survey {
         if (questions == null) {
             return 0;
         }
-        return questions.stream()
-                .filter(question -> question.getChoices() == null)
+        final int totalResponses = questions.stream()
+                .filter(question -> question.getChoices() != null)
                 .flatMap(question -> question.getChoices().stream())
-                .map(choice -> choice.getResponses().size())
+                .map(choice -> Optional.ofNullable(choice.getResponses()).map(List::size).orElse(0))
                 .reduce(0, Integer::sum);
+        return totalResponses / questions.size(); // TODO: This is a hack with the assumption that all questions need to be taken.
     }
 }

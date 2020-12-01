@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,5 +31,6 @@ public class User {
     private String name;
 
     @OneToMany(mappedBy = "publisher", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private List<Survey> surveys;
 }

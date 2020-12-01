@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -37,6 +39,7 @@ public class Question {
     private Survey survey;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private List<Choice> choices;
 
     private boolean required;

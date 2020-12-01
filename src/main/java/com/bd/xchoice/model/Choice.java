@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -36,7 +38,8 @@ public class Choice {
     @ManyToOne
     private Question question;
 
-    @OneToMany(mappedBy = "choice", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "choice", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private List<Response> responses;
 
     public void attachReferenceToChild() {

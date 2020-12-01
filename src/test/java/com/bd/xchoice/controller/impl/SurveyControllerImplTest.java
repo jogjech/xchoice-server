@@ -1,8 +1,11 @@
 package com.bd.xchoice.controller.impl;
 
+import com.bd.xchoice.model.Choice;
+import com.bd.xchoice.model.Question;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
 import com.bd.xchoice.model.User;
+import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
 import com.bd.xchoice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +15,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +50,8 @@ class SurveyControllerImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private ResponseRepository responseRepository;
+    @Mock
     private Survey surveyInput;
     @Mock
     private Survey surveyResponse;
@@ -54,6 +63,18 @@ class SurveyControllerImplTest {
     private Survey survey1;
     @Mock
     private Survey survey2;
+    @Mock
+    private Question question1;
+    @Mock
+    private Question question2;
+    @Mock
+    private Choice choice1;
+    @Mock
+    private Choice choice2;
+    @Mock
+    private Choice choice3;
+    @Mock
+    private Choice choice4;
 
     @InjectMocks
     private SurveyControllerImpl surveyController;
@@ -78,6 +99,18 @@ class SurveyControllerImplTest {
         when(survey2.getTotalResponses()).thenReturn(RESPONSES_2);
         when(survey1.getId()).thenReturn(SURVEY_ID_1);
         when(survey2.getId()).thenReturn(SURVEY_ID_2);
+        final List<Question> questionList = new ArrayList<>();
+        questionList.add(question1);
+        questionList.add(question2);
+        when(surveyResponse.getQuestions()).thenReturn(questionList);
+        final List<Choice> choiceList1 = new ArrayList<>();
+        choiceList1.add(choice1);
+        choiceList1.add(choice2);
+        final List<Choice> choiceList2 = new ArrayList<>();
+        choiceList2.add(choice3);
+        choiceList2.add(choice4);
+        when(question1.getChoices()).thenReturn(choiceList1);
+        when(question2.getChoices()).thenReturn(choiceList2);
     }
 
     @Test
@@ -135,11 +168,30 @@ class SurveyControllerImplTest {
 
     @Test
     void findSurveys_nullUserId() {
-
+        assertThrows(NullPointerException.class, () -> surveyController.findSurveys(null));
     }
 
     @Test
     void findSurveys_userNotExist() {
+        assertThrows(NoSuchElementException.class, () -> surveyController.findSurveys(ANOTHER_USER_ID));
+    }
 
+    @Test
+    void postSurveyResponse_happyPath() {
+        final String slug = surveyController.postSurveyResponse(SURVEY_ID_1, Arrays.asList(0, 1));
+
+        assertNotNull(slug);
+        verify(responseRepository, times(2)).save(any());
+    }
+
+    @Test
+    void postSurveyResponse_nullInputs() {
+        assertThrows(NullPointerException.class, () -> surveyController.postSurveyResponse(null, Arrays.asList(0, 1)));
+        assertThrows(NullPointerException.class, () -> surveyController.postSurveyResponse(SURVEY_ID_1, null));
+    }
+
+    @Test
+    void postSurveyResponse_surveyNotExist() {
+        assertThrows(NoSuchElementException.class, () -> surveyController.postSurveyResponse(SURVEY_ID_2, Arrays.asList(0, 1)));
     }
 }

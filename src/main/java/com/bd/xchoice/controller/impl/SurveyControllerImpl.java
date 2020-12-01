@@ -1,20 +1,24 @@
 package com.bd.xchoice.controller.impl;
 
 import com.bd.xchoice.controller.SurveyController;
+import com.bd.xchoice.model.Choice;
+import com.bd.xchoice.model.Question;
+import com.bd.xchoice.model.Response;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
 import com.bd.xchoice.model.SurveyResponse;
 import com.bd.xchoice.model.User;
+import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
 import com.bd.xchoice.repository.UserRepository;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -29,7 +33,9 @@ public class SurveyControllerImpl implements SurveyController {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional
+    @Autowired
+    private ResponseRepository responseRepository;
+
     @Override
     public Survey createSurvey(@NonNull final Survey survey) {
         final User publisher = userRepository.findById(survey.getPublisherId())
@@ -66,8 +72,21 @@ public class SurveyControllerImpl implements SurveyController {
     }
 
     @Override
-    public String postSurveyResponse(final String id, final List<Integer> selections) {
-        return null;
+    public String postSurveyResponse(@NonNull final Integer id, @NonNull final List<Integer> selections) {
+        final Survey survey = surveyRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        final String slug = UUID.randomUUID().toString();
+
+        for (int i = 0; i < selections.size(); i++) {
+            final Question question = survey.getQuestions().get(i);
+            final Choice selectedChoice = question.getChoices().get(selections.get(i));
+            final Response response = Response.builder()
+                    .choice(selectedChoice)
+                    .slug(slug)
+                    .build();
+            responseRepository.save(response);
+            selectedChoice.getResponses().add(response);
+        }
+        return slug;
     }
 
     @Override

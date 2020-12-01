@@ -29,4 +29,6 @@ public class Response {
     @JsonIgnore
     @ManyToOne
     private Choice choice;
+
+    private String slug;
 }

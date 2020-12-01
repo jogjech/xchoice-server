@@ -51,7 +51,7 @@ public interface SurveyController {
      * @return Slug of the response.
      */
     @PostMapping("/surveys/{id}/responses")
-    String postSurveyResponse(@PathVariable String id, @RequestBody List<Integer> selections);
+    String postSurveyResponse(@PathVariable Integer id, @RequestBody List<Integer> selections);
 
     /**
      * Get responses using slug id.
