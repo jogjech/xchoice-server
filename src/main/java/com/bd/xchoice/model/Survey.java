@@ -44,9 +44,6 @@ public class Survey {
     @ManyToOne
     private User publisher;
 
-    @Transient
-    private int publisherId;
-
     public void attachReferenceToChild() {
         if (questions != null) {
             questions.forEach(question -> {

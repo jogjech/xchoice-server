@@ -20,6 +20,7 @@ public interface UserController {
 
     /**
      * Get the user by user id.
+     * Note: this API is only for testing purpose.
      *
      * @param id the user id
      * @return the User object
