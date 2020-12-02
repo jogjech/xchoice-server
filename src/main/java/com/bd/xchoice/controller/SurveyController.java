@@ -26,6 +26,7 @@ public interface SurveyController {
     Survey createSurvey(@RequestBody Survey survey);
 
     /**
+     * Public API.
      * Get a survey by survey id.
      *
      * @param id The id of the survey
@@ -43,6 +44,7 @@ public interface SurveyController {
     List<SurveyMetadata> findSurveys();
 
     /**
+     * Public API.
      * Post responses for a given survey.
      *
      * @param id The survey id
@@ -53,6 +55,7 @@ public interface SurveyController {
     String postSurveyResponse(@PathVariable Integer id, @RequestBody List<Integer> selections);
 
     /**
+     * Public API.
      * Get responses using slug id.
      *
      * @param slug The response slug
