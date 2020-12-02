@@ -11,6 +11,7 @@ import com.bd.xchoice.model.User;
 import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
 import com.bd.xchoice.repository.UserRepository;
+import com.bd.xchoice.security.JwtUtil;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +59,7 @@ public class SurveyControllerImpl implements SurveyController {
 
     @Override
     public List<SurveyMetadata> findSurveys(@NonNull final Integer userId) {
+        System.out.println(JwtUtil.getUserEmail());
         final User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Cannot find user with id " + userId));
 

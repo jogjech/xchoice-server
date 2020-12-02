@@ -51,18 +51,6 @@ class UserControllerImplTest {
     }
 
     @Test
-    void createUser_happyPath() {
-        final User response = userController.createUser(userInput);
-
-        assertEquals(userResponse, response);
-    }
-
-    @Test
-    void createUser_nullUserInput() {
-        assertThrows(NullPointerException.class, () -> userController.createUser(null));
-    }
-
-    @Test
     void getUser_happyPath() {
         final User response = userController.getUser(USER_ID);
 
