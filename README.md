@@ -32,7 +32,18 @@ In IntelliJ, right click on `src/test/java` folder and select Run 'All Tests'.
 
 ## API Design
 
-TBD
+### Survey State Change
+At a given time, a survey can be in `DRAFT`, `PUBLISHED`, `UNPUBLISHED`, `CANCELED` states.
+
+![](designs/survey_state_change.png)
+
+
+| State | Behavior to survey participant | Behavior to publisher |
+| ---- | ---- | --- |
+| `DRAFT` | invisible | visible and editable |
+| `PUBLISHED` | visible and workable | visible but not editable |
+| `UNPUBLISHED` | invisible | visible and editable |
+| `DELETED` | invisible | invisible |
 
 ## Appendix
 
