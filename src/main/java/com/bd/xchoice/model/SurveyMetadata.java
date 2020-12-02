@@ -22,4 +22,6 @@ public class SurveyMetadata {
     private int responses;
 
     private boolean published;
+
+    private SurveyStatus status;
 }

@@ -14,8 +14,12 @@ public final class JwtUtil {
      * @return user email
      */
     public static String getUserEmail() {
-        final Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return (String) jwt.getClaims().get("https://x-choice-server.com/email");
+        try {
+            final Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return (String) jwt.getClaims().get("https://x-choice-server.com/email");
+        } catch (final Exception e) {
+            return null;
+        }
     }
 
     private JwtUtil() {}

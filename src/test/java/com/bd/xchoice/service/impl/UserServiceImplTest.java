@@ -23,6 +23,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test class for UserServiceImpl.
+ */
 class UserServiceImplTest {
 
     private static final Integer USER_ID = 17;

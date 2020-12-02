@@ -34,7 +34,7 @@ public class SurveyControllerImpl implements SurveyController {
 
     @Override
     public Survey getSurvey(@NonNull final Integer id) {
-        return surveyService.getSurvey(id);
+        return surveyService.getSurvey(id, JwtUtil.getUserEmail());
     }
 
     @Override

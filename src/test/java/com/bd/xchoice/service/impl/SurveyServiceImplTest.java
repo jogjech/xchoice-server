@@ -1,12 +1,12 @@
 package com.bd.xchoice.service.impl;
 
-import com.bd.xchoice.controller.impl.SurveyControllerImpl;
 import com.bd.xchoice.model.Choice;
 import com.bd.xchoice.model.Question;
 import com.bd.xchoice.model.Response;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
 import com.bd.xchoice.model.SurveyResponse;
+import com.bd.xchoice.model.SurveyStatus;
 import com.bd.xchoice.model.User;
 import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +30,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test class for SurveyServiceImpl.
+ */
 class SurveyServiceImplTest {
 
     private static final Integer SURVEY_ID_1 = 29;
@@ -44,6 +46,7 @@ class SurveyServiceImplTest {
     private static final String TITLE_2 = "Title 2";
     private static final String SLUG_1 = "slug1";
     private static final String SLUG_2 = "slug2";
+    private static final String EMAIL = "email";
 
     @Mock
     private SurveyRepository surveyRepository;
@@ -61,6 +64,8 @@ class SurveyServiceImplTest {
     private User userInput;
     @Mock
     private User userResponse;
+    @Mock
+    private User publisher;
     @Mock
     private Survey survey1;
     @Mock
@@ -108,6 +113,9 @@ class SurveyServiceImplTest {
         questionList.add(question1);
         questionList.add(question2);
         when(surveyResponse.getQuestions()).thenReturn(questionList);
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.PUBLISHED);
+        when(surveyResponse.getPublisher()).thenReturn(publisher);
+        when(publisher.getEmail()).thenReturn(EMAIL);
         final List<Choice> choiceList1 = new ArrayList<>();
         choiceList1.add(choice1);
         choiceList1.add(choice2);
@@ -145,15 +153,69 @@ class SurveyServiceImplTest {
     }
 
     @Test
-    void getSurvey_happyPath() {
-        final Survey response = surveyService.getSurvey(SURVEY_ID_1);
+    void getSurvey_externalUserGetPublishedSurvey() {
+        final Survey response = surveyService.getSurvey(SURVEY_ID_1, null);
 
         assertEquals(surveyResponse, response);
     }
 
     @Test
-    void getSurvey_userNotExist() {
-        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(ANOTHER_SURVEY_ID));
+    void getSurvey_externalUserGetUnpublishedSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.UNPUBLISHED);
+
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(SURVEY_ID_1, null));
+    }
+
+    @Test
+    void getSurvey_externalUserGetDeletedSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.DELETED);
+
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(SURVEY_ID_1, null));
+    }
+
+    @Test
+    void getSurvey_externalUserGetDraftSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.DRAFT);
+
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(SURVEY_ID_1, null));
+    }
+
+    @Test
+    void getSurvey_publisherGetPublishedSurvey() {
+        final Survey response = surveyService.getSurvey(SURVEY_ID_1, EMAIL);
+
+        assertEquals(surveyResponse, response);
+    }
+
+    @Test
+    void getSurvey_publisherGetUnpublishedSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.UNPUBLISHED);
+
+        final Survey response = surveyService.getSurvey(SURVEY_ID_1, EMAIL);
+
+        assertEquals(surveyResponse, response);
+    }
+
+    @Test
+    void getSurvey_publisherGetDeletedSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.DELETED);
+
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(SURVEY_ID_1, EMAIL));
+    }
+
+    @Test
+    void getSurvey_publisherGetDraftSurvey() {
+        when(surveyResponse.getStatus()).thenReturn(SurveyStatus.DRAFT);
+
+        final Survey response = surveyService.getSurvey(SURVEY_ID_1, EMAIL);
+
+        assertEquals(surveyResponse, response);
+    }
+
+    @Test
+    void getSurvey_surveyNotExist() {
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(ANOTHER_SURVEY_ID, EMAIL));
+        assertThrows(NoSuchElementException.class, () -> surveyService.getSurvey(ANOTHER_SURVEY_ID, null));
     }
 
     @Test

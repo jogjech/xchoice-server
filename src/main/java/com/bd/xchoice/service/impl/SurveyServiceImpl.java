@@ -6,10 +6,12 @@ import com.bd.xchoice.model.Response;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
 import com.bd.xchoice.model.SurveyResponse;
+import com.bd.xchoice.model.SurveyStatus;
 import com.bd.xchoice.model.User;
 import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
 import com.bd.xchoice.repository.UserRepository;
+import com.bd.xchoice.security.JwtUtil;
 import com.bd.xchoice.service.SurveyService;
 import com.bd.xchoice.service.UserService;
 import lombok.NonNull;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +44,7 @@ public class SurveyServiceImpl implements SurveyService {
     public Survey createSurvey(@NonNull final Survey survey, @NonNull final User user) {
         survey.attachReferenceToChild();
         survey.setPublisher(user);
+        survey.setStatus(SurveyStatus.PUBLISHED);
         final Survey result = surveyRepository.save(survey);
         if (user.getSurveys() == null) {
             user.setSurveys(new ArrayList<>());
@@ -51,8 +55,23 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public Survey getSurvey(final int id) {
-        return surveyRepository.findById(id).orElseThrow(NoSuchElementException::new);
+    public Survey getSurvey(final int id, final String email) {
+        final Survey survey = surveyRepository.findById(id).orElseThrow(NoSuchElementException::new);
+
+        if (SurveyStatus.PUBLISHED.equals(survey.getStatus())) {
+            return survey;
+        }
+
+        if (SurveyStatus.DELETED.equals(survey.getStatus())) {
+            throw new NoSuchElementException("This survey has been deleted.");
+        }
+
+        if (email != null) {
+            if (survey.getPublisher().getEmail().equalsIgnoreCase(email)) {
+                return survey;
+            }
+        }
+        throw new NoSuchElementException("Cannot find survey");
     }
 
     @Override
@@ -63,6 +82,7 @@ public class SurveyServiceImpl implements SurveyService {
                         .title(survey.getTitle())
                         .responses(survey.getTotalResponses())
                         .surveyId(survey.getId())
+                        .status(survey.getStatus())
                         .build())
                 .collect(Collectors.toList());
     }

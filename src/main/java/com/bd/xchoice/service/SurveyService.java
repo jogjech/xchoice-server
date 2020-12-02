@@ -11,7 +11,7 @@ public interface SurveyService {
 
     Survey createSurvey(Survey survey, User user);
 
-    Survey getSurvey(int id);
+    Survey getSurvey(int id, String email);
 
     List<SurveyMetadata> findSurveys(User user);
 
