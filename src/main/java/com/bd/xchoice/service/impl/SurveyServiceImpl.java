@@ -16,12 +16,12 @@ import com.bd.xchoice.service.SurveyService;
 import com.bd.xchoice.service.UserService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -130,5 +130,23 @@ public class SurveyServiceImpl implements SurveyService {
                 .selections(selections)
                 .surveyId(questions.get(0).getSurvey().getId())
                 .build();
+    }
+
+    @Override
+    public void updateSurveyStatus(int id, @NonNull final SurveyStatus initialStatus, @NonNull final SurveyStatus targetStatus) {
+        if (initialStatus.equals(targetStatus)) {
+            return;
+        }
+        if (invalidStatusTransition(initialStatus, targetStatus)) {
+            throw new IllegalArgumentException(String.format("Illegal status transition from %s to %s", initialStatus, targetStatus));
+        }
+        surveyRepository.setStatusForSurvey(id, targetStatus);
+    }
+
+    private boolean invalidStatusTransition(final SurveyStatus initialStatus, final SurveyStatus targetStatus) {
+        return SurveyStatus.DRAFT.equals(targetStatus)
+                || SurveyStatus.DELETED.equals(initialStatus)
+                || (SurveyStatus.DRAFT.equals(initialStatus) && SurveyStatus.UNPUBLISHED.equals(targetStatus))
+                || (SurveyStatus.PUBLISHED.equals(initialStatus) && SurveyStatus.DELETED.equals(targetStatus));
     }
 }

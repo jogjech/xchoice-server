@@ -52,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET, "/surveys").authenticated()
                 .mvcMatchers(HttpMethod.POST, "/surveys").authenticated()
                 .mvcMatchers(HttpMethod.POST, "/users").authenticated()
+                .mvcMatchers(HttpMethod.POST, "/surveys/{id}").authenticated()
                 .and().cors()
                 .and().oauth2ResourceServer().jwt();
     }

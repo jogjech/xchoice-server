@@ -4,6 +4,7 @@ import com.bd.xchoice.controller.SurveyController;
 import com.bd.xchoice.model.Survey;
 import com.bd.xchoice.model.SurveyMetadata;
 import com.bd.xchoice.model.SurveyResponse;
+import com.bd.xchoice.model.SurveyStatus;
 import com.bd.xchoice.model.User;
 import com.bd.xchoice.security.JwtUtil;
 import com.bd.xchoice.service.SurveyService;
@@ -51,5 +52,16 @@ public class SurveyControllerImpl implements SurveyController {
     @Override
     public SurveyResponse findSurveyResponse(@NonNull final String slug) {
         return surveyService.findSurveyResponse(slug);
+    }
+
+    @Override
+    public void updateSurveyStatus(@NonNull Integer id, @NonNull final SurveyStatus status) {
+        final Survey survey = surveyService.getSurvey(id, JwtUtil.getUserEmail());
+        surveyService.updateSurveyStatus(id, survey.getStatus(), status);
+    }
+
+    @Override
+    public void deleteSurvey() {
+
     }
 }

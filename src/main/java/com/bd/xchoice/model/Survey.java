@@ -10,6 +10,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -36,7 +37,7 @@ public class Survey {
 
     private String title;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private SurveyStatus status;
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
