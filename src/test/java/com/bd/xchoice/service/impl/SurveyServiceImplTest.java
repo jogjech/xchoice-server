@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -109,6 +112,8 @@ class SurveyServiceImplTest {
         when(survey2.getTotalResponses()).thenReturn(RESPONSES_2);
         when(survey1.getId()).thenReturn(SURVEY_ID_1);
         when(survey2.getId()).thenReturn(SURVEY_ID_2);
+        when(survey1.getStatus()).thenReturn(SurveyStatus.UNPUBLISHED);
+        when(survey2.getStatus()).thenReturn(SurveyStatus.DRAFT);
         final List<Question> questionList = new ArrayList<>();
         questionList.add(question1);
         questionList.add(question2);
@@ -231,6 +236,19 @@ class SurveyServiceImplTest {
         assertEquals(RESPONSES_2, surveyMetadataList.get(1).getResponses());
         assertTrue(surveyMetadataList.get(0).isPublished());
         assertTrue(surveyMetadataList.get(1).isPublished());
+    }
+
+    @Test
+    void findSurveys_filterOutDeletedSurveys() {
+        when(survey2.getStatus()).thenReturn(SurveyStatus.DELETED);
+
+        final List<SurveyMetadata> surveyMetadataList = surveyService.findSurveys(userResponse);
+
+        assertEquals(1, surveyMetadataList.size());
+        assertEquals(TITLE_1, surveyMetadataList.get(0).getTitle());
+        assertEquals(SURVEY_ID_1, surveyMetadataList.get(0).getSurveyId());
+        assertEquals(RESPONSES_1, surveyMetadataList.get(0).getResponses());
+        assertTrue(surveyMetadataList.get(0).isPublished());
     }
 
     @Test

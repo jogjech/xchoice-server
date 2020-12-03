@@ -11,12 +11,10 @@ import com.bd.xchoice.model.User;
 import com.bd.xchoice.repository.ResponseRepository;
 import com.bd.xchoice.repository.SurveyRepository;
 import com.bd.xchoice.repository.UserRepository;
-import com.bd.xchoice.security.JwtUtil;
 import com.bd.xchoice.service.SurveyService;
 import com.bd.xchoice.service.UserService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -77,6 +75,7 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public List<SurveyMetadata> findSurveys(@NonNull final User user) {
         return user.getSurveys().stream()
+                .filter(survey -> !SurveyStatus.DELETED.equals(survey.getStatus()))
                 .map(survey -> SurveyMetadata.builder()
                         .published(true)
                         .title(survey.getTitle())
