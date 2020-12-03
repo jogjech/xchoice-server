@@ -29,6 +29,17 @@ Since this service calls MySQL database, to avoid exposing the database login cr
 
 In IntelliJ, right click on `src/test/java` folder and select Run 'All Tests'.
 
+## DB Design
+### ER Diagrams
+If we require survey takers to log in to take the survey (in other words survey can only be taken by authed users), here's the ER diagram:
+![](designs/ER_diagram_taker_need_auth.png)
+In this model, taker can be the publisher and vise versa.
+
+If we consider survey taker to be anyone (including the audience who don't log in), here is the ER diagram:
+![](designs/ER_diagram_taker_no_need_auth.png)
+In this model taker and publisher are modeled separately. For simplicity, we didn't even model taker in the DB.
+
+Comparing those two models, I picked the latter one since most of the survey apps can collect responses from public. Forcing them to log in can increase friction. And we are not providing additional values if they log in. Based on future needs, we can re-evaluate the need to modeling authed taker.
 
 ## API Design
 
