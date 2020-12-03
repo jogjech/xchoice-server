@@ -76,14 +76,16 @@ SurveyMetadata
 }
 ```
 
-| Resource | HTTP Method | Input | Output | Business Logic |
-| ---- | ---- | --- | --- | --- |
-| `/surveys` | `POST` | Survey object with no ids and responses | Survey object with ids but no responses | Create survey |
-| `/surveys` | `GET` | Empty | a List of SurveyMetadata | Find surveys published by user for displaying dashboard |
-| `/surveys/{id}/responses` | `POST` | 3 (id), `[3,1,0]`. The second param is the selections. ex. the `3` at index 0 denotes for question 1 (0+1), customer selected the 4th option (3+1). | slug (ex. `ladksfadkjs`). Slug is a short string which can be used to come back to the selection. | Capture survey taker's selection |
-| `/surveys/responses` | `GET` | slug | `["surveyId": 3, selections: "[3,1,0]"]` | Get the response. This is for displaying the taker the previous selections he/she made
-| `/surveys/{id}` | `POST` | 3 (id), "PUBLISHED" (target status) | empty | Update a survey to target status. The logic has check to make sure the transition follows the state machine.
-| `/surveys/{id}` | `DELETE` | 3 (id) | empty | Delete a survey. This API was not implemented. Instead, we use the update survey status API to perform a soft delete for now: survey will be marked as `DELETED` but not removed from our DB.
+| Resource | HTTP Method | Is public API? | Input | Output | Business Logic |
+| ---- | ---- | --- | --- | --- | --- |
+| `/surveys` | `POST` | No | Survey object with no ids and responses | Survey object with ids but no responses | Create survey |
+| `/surveys` | `GET` | No | Empty | a List of SurveyMetadata | Find surveys published by user for displaying dashboard |
+| `/surveys/{id}/responses` | `POST` | Yes | 3 (id), `[3,1,0]`. The second param is the selections. ex. the `3` at index 0 denotes for question 1 (0+1), customer selected the 4th option (3+1). | slug (ex. `ladksfadkjs`). Slug is a short string which can be used to come back to the selection. | Capture survey taker's selection |
+| `/surveys/responses` | `GET` | Yes | slug | `["surveyId": 3, selections: "[3,1,0]"]` | Get the response. This is for displaying the taker the previous selections he/she made
+| `/surveys/{id}` | `POST` | No | 3 (id), "PUBLISHED" (target status) | Empty | Update a survey to target status. The logic has check to make sure the transition follows the state machine.
+| `/surveys/{id}` | `GET` | Yes | 3 (id) | Survey object | Get a given survey for taker to take
+| `/surveys/{id}` | `DELETE` | No | 3 (id) | Empty | Delete a survey. This API was not implemented. Instead, we use the update survey status API to perform a soft delete for now: survey will be marked as `DELETED` but not removed from our DB.
+| `/users` | `POST` | Yes | Empty. Because we can read the info from JWT token. | Empty | Put user to DB right after user logs int. This is to make sure the user id is created in our DB.
 
 ## Prod deployment
 The Spring Boot app is being hosted on [Heroku](https://www.heroku.com/) with a ClearDB add-on for our MySQL. The endpoint is: https://x-choice-server.herokuapp.com/
