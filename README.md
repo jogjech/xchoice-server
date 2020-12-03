@@ -41,12 +41,10 @@ In this model taker and publisher are modeled separately. For simplicity, we did
 
 Comparing those two models, I picked the latter one since most of the survey apps can collect responses from public. Forcing them to log in can increase friction. And we are not providing additional values if they log in. Based on future needs, we can re-evaluate the need to modeling authed taker.
 
-## API Design
-
 ### Survey State Change
-At a given time, a survey can be in `DRAFT`, `PUBLISHED`, `UNPUBLISHED`, `CANCELED` states.
-
+At a given time, a survey can be in `DRAFT`, `PUBLISHED`, `UNPUBLISHED`, `CANCELED` states. Those states are modeled and persisted in DB and surfaced to end user through API. The movements in the state machine are validated in API layer to keep DB query simple.
 ![](designs/survey_state_change.png)
+
 
 
 | State | Behavior to survey participant | Behavior to publisher |
@@ -56,6 +54,53 @@ At a given time, a survey can be in `DRAFT`, `PUBLISHED`, `UNPUBLISHED`, `CANCEL
 | `UNPUBLISHED` | invisible | visible and editable |
 | `DELETED` | invisible | invisible |
 
+## API Design
+
+### Models
+Survey
+```json
+{
+  "id": 3,
+  "title": "st",
+  "questions": [
+    {
+      "id": 4,
+      "title": "qt",
+      "choices":[
+        {
+          "id": 5,
+          "text": "ct",
+          "responses": [
+            {
+              "id": 6,
+              "slug": "asdklfnwek"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+SurveyMetadata
+```json
+{
+  "surveyId": 3,
+  "title": "st",
+  "responses": 164,
+  "status": "PUBLISHED"
+}
+```
+
+| Resource | HTTP Method | Input | Output | Business Logic |
+| ---- | ---- | --- | --- | --- |
+| `/surveys` | `POST` | Survey object with no ids and responses | Survey object with ids but no responses | Create survey |
+| `/surveys` | `GET` | Empty | a List of SurveyMetadata | Find surveys published by user for displaying dashboard |
+| `/surveys/{id}/responses` | `POST` | 3 (id), `[3,1,0]`. The second param is the selections. ex. the `3` at index 0 denotes for question 1 (0+1), customer selected the 4th option (3+1). | slug (ex. `ladksfadkjs`). Slug is a short string which can be used to come back to the selection. | Capture survey taker's selection |
+| `/surveys/responses` | `GET` | slug | `["surveyId": 3, selections: "[3,1,0]"]` | Get the response. This is for displaying the taker the previous selections he/she made
+| `/surveys/{id}` | `POST` | 3 (id), "PUBLISHED" (target status) | empty | Update a survey to target status. The logic has check to make sure the transition follows the state machine.
+| `/surveys/{id}` | `DELETE` | 3 (id) | empty | Delete a survey. This API was not implemented. Instead, we use the update survey status API to perform a soft delete for now: survey will be marked as `DELETED` but not removed from our DB.
 ## Appendix
 
 ### References
