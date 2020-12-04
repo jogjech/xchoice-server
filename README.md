@@ -87,6 +87,13 @@ SurveyMetadata
 | `/surveys/{id}` | `DELETE` | No | 3 (id) | Empty | Delete a survey. This API was not implemented. Instead, we use the update survey status API to perform a soft delete for now: survey will be marked as `DELETED` but not removed from our DB.
 | `/users` | `POST` | Yes | Empty. Because we can read the info from JWT token. | Empty | Put user to DB right after user logs int. This is to make sure the user id is created in our DB.
 
+## Authentication
+For private APIs, UI will request an access token from Auth0 and send to backend through HTTP request header as a bearer token. We use Spring Security 5 to validate the header of the token to make sure it is valid. For manual validation, we can go to https://jwt.io/ and check the access token.
+
+For most of our usecases we need to understand which customer it is. The reason we don't let client pass the email id is that the email id can be faked. The way we get email id is by configuring an [Auth0 rule](https://auth0.com/docs/rules) to pass email id to access token. By using this we can make sure the email we get is secure and unmodified.
+
+Then the server will call DB to get user id from the user email and perform other actions.
+
 ## Prod deployment
 The Spring Boot app is being hosted on [Heroku](https://www.heroku.com/) with a ClearDB add-on for our MySQL. The endpoint is: https://x-choice-server.herokuapp.com/
 
